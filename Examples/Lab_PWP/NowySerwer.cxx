@@ -145,7 +145,8 @@ int main(int argc, char* argv[])
 #if OpenIGTLink_PROTOCOL_VERSION >= 2
         else if (strcmp(headerMsg->GetDeviceType(), "POINT") == 0)
           {
-          ReceivePoint(socket, headerMsg);
+          igtl::PointElement::Pointer Point = ReceivePoint(socket, headerMsg);
+ 	  
           }
         else if (strcmp(headerMsg->GetDeviceType(), "TRAJ") == 0)
           {
@@ -342,7 +343,7 @@ int ReceiveStatus(igtl::Socket * socket, igtl::MessageHeader * header)
 
 
 #if OpenIGTLink_PROTOCOL_VERSION >= 2
-int ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
+igtl::PointElement::Pointer ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
 {
 
   std::cerr << "Receiving POINT data type." << std::endl;
@@ -386,7 +387,7 @@ int ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
       }
     }
 
-  return 1;
+  return pointElement;
 }
 
 int ReceiveTrajectory(igtl::Socket * socket, igtl::MessageHeader::Pointer& header)
