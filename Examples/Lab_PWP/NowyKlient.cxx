@@ -21,7 +21,7 @@
 #include "igtlMessageHeader.h"
 
 
-int ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
+int ReceivePoint(igtl::Socket* socket, igtl::MessageHeader* header);
 
 int main(int argc, char* argv[])
 {
@@ -159,7 +159,6 @@ int ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
 
       igtlFloat32 pos[3];
       pointElement->GetPosition(pos);
-      std::cout << pointElement->GetPosition(pos) << std::end;
 
       std::cerr << "========== Element #" << i << " ==========" << std::endl;
       std::cerr << " Name      : " << pointElement->GetName() << std::endl;

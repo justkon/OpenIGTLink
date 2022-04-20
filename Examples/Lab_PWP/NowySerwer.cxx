@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 #if OpenIGTLink_PROTOCOL_VERSION >= 2
         else if (strcmp(headerMsg->GetDeviceType(), "POINT") == 0)
           {
-          igtl::PointElement::Pointer Point = ReceivePoint(socket, headerMsg);
+          ReceivePoint(socket, headerMsg);
  	  
           }
         else if (strcmp(headerMsg->GetDeviceType(), "TRAJ") == 0)
@@ -343,7 +343,7 @@ int ReceiveStatus(igtl::Socket * socket, igtl::MessageHeader * header)
 
 
 #if OpenIGTLink_PROTOCOL_VERSION >= 2
-igtl::PointElement::Pointer ReceivePoint(igtl::Socket * socket, igtl::MessageHeader * header)
+int ReceivePoint(igtl::Socket* socket, igtl::MessageHeader* header)
 {
 
   std::cerr << "Receiving POINT data type." << std::endl;
@@ -387,7 +387,65 @@ igtl::PointElement::Pointer ReceivePoint(igtl::Socket * socket, igtl::MessageHea
       }
     }
 
-  return pointElement;
+  // Create a point message
+  igtl::PointMessage::Pointer pointMsg0;
+  pointMsg0 = igtl::PointMessage::New();
+  pointMsg0->SetDeviceName("PointSender0");
+
+  igtl::PointMessage::Pointer pointMsg1;
+  pointMsg1 = igtl::PointMessage::New();
+  pointMsg1->SetDeviceName("PointSender1");
+
+  igtl::PointMessage::Pointer pointMsg2;
+  pointMsg2 = igtl::PointMessage::New();
+  pointMsg2->SetDeviceName("PointSender2");
+
+  // Create 1st point
+  igtl::PointElement::Pointer point0;
+  point0 = igtl::PointElement::New();
+  pointMsg->GetPointElement(0, point0);
+  igtlFloat32 pos[3];
+  point0->GetPosition(pos);
+  point0->SetPosition(-pos[0],-pos[1],-pos[2]);
+
+  //---------------------------
+  // Create 2nd point
+  igtl::PointElement::Pointer point1;
+  point1 = igtl::PointElement::New();
+  pointMsg->GetPointElement(1, point1);
+  point1->GetPosition(pos);
+  point1->SetPosition(-pos[0], -pos[1], -pos[2]);
+
+  //---------------------------
+  // Create 3rd point
+  igtl::PointElement::Pointer point2;
+  point2 = igtl::PointElement::New();
+  pointMsg->GetPointElement(2, point2);
+  point2->GetPosition(pos);
+  point2->SetPosition(-pos[0], -pos[1], -pos[2]);
+
+
+  // Pack into the point message
+  pointMsg0->AddPointElement(point0);
+  pointMsg0->Pack();
+  pointMsg1->AddPointElement(point1);
+  pointMsg1->Pack();
+  pointMsg2->AddPointElement(point2);
+  pointMsg2->Pack();
+
+  //------------------------------------------------------------
+// Send
+  socket->Send(pointMsg0->GetPackPointer(), pointMsg0->GetPackSize());
+  igtl::Sleep(5000);
+  socket->Send(pointMsg1->GetPackPointer(), pointMsg1->GetPackSize());
+  igtl::Sleep(5000);
+  socket->Send(pointMsg2->GetPackPointer(), pointMsg2->GetPackSize());
+  igtl::Sleep(50000);
+  //------------------------------------------------------------
+  // Close the socket
+  socket->CloseSocket();
+
+  return 1;
 }
 
 int ReceiveTrajectory(igtl::Socket * socket, igtl::MessageHeader::Pointer& header)
